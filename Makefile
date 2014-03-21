@@ -1,14 +1,15 @@
 CFLAGS  += -I/usr/local/include -std=c99 -Wall
 LDFLAGS += -L/usr/local/lib -lcurl
 PREFIX   = /usr/local
-VERSION  = 1.5
-RM       = /bin/rm -rf
+VERSION  = 1.54
+RM       = /bin/rm
 
 ioup:
 	@${CC} -o $@ -DVERSION=\"${VERSION}\" ioup.c ${CFLAGS} ${LDFLAGS}
 
 clean:
-	${RM} {ioup,*.o,*~}
+	${RM} ioup
+	${RM} *.o
 
 install:
 	install -m755 ioup   ${PREFIX}/bin/ioup
