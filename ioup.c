@@ -19,16 +19,11 @@
 
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <curl/curl.h>
-
-#include "config.h"
-
-#ifndef TOKEN
-#error "please set the token in config.h"
-#endif
 
 typedef struct {
 	const char *xt;
@@ -39,6 +34,32 @@ typedef struct {
 const char *get_xt (const char *s) {
 	const char *d = strrchr(s, '.');
 	return ! d || d == s ? NULL : d + 1;
+}
+
+char *read_token (void) {
+	int i,c;
+	FILE *fp;
+	char *path,token[12],*r;
+
+	path = getenv("HOME");
+	strncat(path, "/.iouprc", 9);
+
+	if ((fp = fopen(path, "r"))) {
+		for (i=0; i < 10; i++) {
+			c = fgetc(fp);
+			token[i] = c && c != EOF ? (char) c : 0;
+		}
+		token[11] = '\0';
+	} else
+		puts("warning: could not open ~/.iouprc");
+
+	if (strnlen(token,32) != 10)
+		puts("warning: token is too short, please check ~/.iouprc");
+
+	r = malloc(sizeof(char)*10);
+	strncpy(r, token, 10);
+
+	return r;
 }
 
 void io_post (io_t io) {
@@ -66,13 +87,14 @@ void io_post (io_t io) {
 		if (in && out) {
 			while (!feof(in)) {
 				chr = fgetc(in);
-				if (chr != EOF) {
+				if (chr != EOF)
 					fputc(chr, out);
-		}	}	}
+			}
+		}
 
 		fclose(in);
 		fclose(out);
-	} else { io.xt = get_xt(io.file); }
+	} else io.xt = get_xt(io.file);
 
 	curl_global_init(CURL_GLOBAL_ALL);
 
@@ -89,13 +111,12 @@ void io_post (io_t io) {
 			CURLFORM_END);
 
 	if (!io.list && !io.remove) {
-
 		curl_formadd(	&formpost,
 				&lastptr,
 				CURLFORM_COPYNAME, "xt",
 				CURLFORM_COPYCONTENTS, io.xt,
 				CURLFORM_END);
-	
+
 		curl_formadd(	&formpost,
 				&lastptr,
 				CURLFORM_COPYNAME, "pdata",
@@ -136,7 +157,12 @@ void io_post (io_t io) {
 
 int main (int argc, char *argv[]) {
 	io_t io;
-	io.token = TOKEN;
+	io.token =
+#ifdef TOKEN
+	TOKEN;
+#else
+	read_token();
+#endif
 	io.list  = io.remove = io.std_in = false;
 	io.file  = (argc >= 2) ? argv[1] : NULL;
 	io.name  = (argc >= 2) ? argv[1] : "stdin";

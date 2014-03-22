@@ -1,7 +1,7 @@
 CFLAGS  += -I/usr/local/include -std=c99 -Wall
 LDFLAGS += -L/usr/local/lib -lcurl
 PREFIX   = /usr/local
-VERSION  = 1.54
+VERSION  = 1.7
 RM       = /bin/rm
 
 ioup:

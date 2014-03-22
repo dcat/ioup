@@ -1,17 +1,14 @@
 .\"Preocess this file with
 .\"groff -man -Tascii foo.1
 .\"
-
-.TH ioup.1 "MARCH 2014" UNIX "User Manuals"
-
+.TH ioup 1
 .SH NAME 
-ioup \- The pub.iotek.org CLIent
-
+ioup \- IOPaste client
 .SH SYNOPSIS
 .B ioup [-l] [-r] 
+.B [
 .I file
-.B ...
-
+.B ]
 .SH DESCRIPTION
 .B ioup
 is a commandline paste client for pub.iotek.org written in C. 
@@ -20,13 +17,11 @@ Is no file extenstion given
 .B ioup 
 will upload it like a text file. So make sure that your file always contains the correct 
 suffix
-
 .SH OPTIONS
 .IP "-l" 
 .B list all files you've alredy pasted on pub.iotek.org
 .IP "-r file"
 .B remove the given file in format as p/RAnD0m
-
 .SH EXEMPLES
 .IP "$ ioup yourfile"
 .B \- uploads an existing file from a local drive
@@ -38,16 +33,12 @@ suffix
 .B \- this removes the file pub.iotek.org/p/RAnD0m
 .IP "$ dmesg | tail -n4 | ioup"
 .B \- used this way, ioup will read directy from STDIN and creates your file on pub.iotek.org itselfs
-
 .SH FILES
-.I ioup/config.h
-
+.I ~/.iouprc
 .SH BUGS
 .B Bugs? There are no Bugs in this Software. It was written through the power of slienz
-
 .SH AUTHOR
 .IP "Jack N. White  <dcat at iotek dot org>"
 .IP "Danny Svensson <neuromatic at archlinux dot info>"
-
 .SH SEE ALSO
 .BR libcurl(3)
