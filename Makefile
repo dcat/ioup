@@ -4,8 +4,15 @@ PREFIX   = /usr/local
 VERSION  = 1.7
 RM       = /bin/rm
 
-ioup:
-	@${CC} -o $@ -DVERSION=\"${VERSION}\" ioup.c ${CFLAGS} ${LDFLAGS}
+.SUFFIXES: .c .o
+
+all: ioup
+
+.c.o:
+	@${CC} ${CFLAGS} -DVERSION=\"${VERSION}\" -c $<
+
+ioup: ioup.o
+	@${CC} ${CFLAGS} ${LDFLAGS} -o $@ ioup.o
 
 clean:
 	${RM} ioup
