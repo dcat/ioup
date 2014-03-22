@@ -25,10 +25,12 @@
 #include <sys/stat.h>
 #include <curl/curl.h>
 
+#define VERB_PRINT(err) if (io.verbose) puts(err)
+
 typedef struct {
 	const char *xt;
 	char *token,*name,*file;
-	bool list,remove,std_in;
+	bool list,remove,std_in,verbose;
 } io_t;
 
 const char *get_xt (const char *s) {
@@ -36,7 +38,7 @@ const char *get_xt (const char *s) {
 	return ! d || d == s ? NULL : d + 1;
 }
 
-char *read_token (void) {
+char *read_token (io_t io) {
 	int i,c;
 	FILE *fp;
 	char *path,token[12],*r;
@@ -51,10 +53,10 @@ char *read_token (void) {
 		}
 		token[11] = '\0';
 	} else
-		puts("warning: could not open ~/.iouprc");
+		VERB_PRINT("warning: could not open ~/.iouprc");
 
 	if (strnlen(token,32) != 10)
-		puts("warning: token is too short, please check ~/.iouprc");
+		VERB_PRINT("warning: token length seems off, please check ~/.iouprc");
 
 	r = malloc(sizeof(char)*10);
 	strncpy(r, token, 10);
@@ -161,9 +163,9 @@ int main (int argc, char *argv[]) {
 #ifdef TOKEN
 	TOKEN;
 #else
-	read_token();
+	read_token(io);
 #endif
-	io.list  = io.remove = io.std_in = false;
+	io.verbose = io.list  = io.remove = io.std_in = false;
 	io.file  = (argc >= 2) ? argv[1] : NULL;
 	io.name  = (argc >= 2) ? argv[1] : "stdin";
 
@@ -177,6 +179,9 @@ int main (int argc, char *argv[]) {
 				io.remove = true;
 				}
 				break;
+			case 'v': io.verbose = true;
+				  argc = argc - 1;
+				  break;
 			case 'V': printf("ioup-%s\n", VERSION);
 				return 0;
 		}
