@@ -12,17 +12,17 @@ ioup \- IOPaste client
 .SH DESCRIPTION
 .B ioup
 is a commandline paste client for pub.iotek.org written in C. 
-It uses libcurl and is able to interpret the file extenstion;
-Is no file extenstion given 
+It uses libcurl to interpret file extenstions;
+if no file extenstion is given or it is unrecognised,
 .B ioup 
-will upload it like a text file. So make sure that your file always contains the correct 
-suffix
+will upload it like a text/binary file. So make sure that your file always contains the correct 
+suffix!
 .SH OPTIONS
 .IP "-l" 
 .B list all files you've alredy pasted on pub.iotek.org
 .IP "-r file"
-.B remove the given file in format as p/RAnD0m
-.SH EXEMPLES
+.B remove the given file in the format: p/RAnD0m
+.SH EXAMPLES
 .IP "$ ioup yourfile"
 .B \- uploads an existing file from a local drive
 .IP "$ ioup < yourfile" 
@@ -32,11 +32,11 @@ suffix
 .IP "$ ioup -r p/RAnD0m" 
 .B \- this removes the file pub.iotek.org/p/RAnD0m
 .IP "$ dmesg | tail -n4 | ioup"
-.B \- used this way, ioup will read directy from STDIN and creates your file on pub.iotek.org itselfs
+.B \- used this way, ioup will read directy from STDIN and creates your file on pub.iotek.org itself
 .SH FILES
 .I ~/.iouprc
 .SH BUGS
-.B Bugs? There are no Bugs in this Software. It was written through the power of slienz
+.B Bugs? There are no bugs in this Software. It was written through the power of slienz.
 .SH AUTHOR
 .IP "Jack N. White  <dcat at iotek dot org>"
 .IP "Danny Svensson <neuromatic at archlinux dot info>"
