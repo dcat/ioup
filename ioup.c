@@ -1,6 +1,6 @@
 /**
  *      ioup.c - upload files to pub.iotek.org
- *  
+ *
  *
  *      Copyright (c) 2014, Broseph <dcat (at) iotek (dot) org>
  *
@@ -49,8 +49,7 @@ char *read_iouprc (void) {
 	FILE *fp;
 	char *path,token[12],*r;
 
-	path = getenv("HOME");
-	strncat(path, "/.iouprc", 9);
+	asprintf(&path, "%s/.iouprc", getenv("HOME"));
 
 	/* byte by byte read */
 	if ((fp = fopen(path, "r"))) {
@@ -60,6 +59,8 @@ char *read_iouprc (void) {
 		}
 		token[11] = '\0';
 	}
+	else
+		return NULL;
 
 	r = malloc(sizeof(char)*10);
 	strncpy(r, token, 10);
@@ -85,7 +86,7 @@ void io_post (ioup_t io) {
 	if (io.std_in) {
 		/* interactive mode? */
 		fstat(0, &sstat);
-		if (S_ISCHR(sstat.st_mode)) 
+		if (S_ISCHR(sstat.st_mode))
 			puts("^C: exit, ^D: post");
 		
 		io.file = "/tmp/ioup.stdin";
@@ -170,7 +171,7 @@ void io_post (ioup_t io) {
 
 int main (int argc, char *argv[]) {
 	ioup_t io;
-	/* if TOKEN defined, hardcode it */
+	/* if TOKEN is defined, hardcode it */
 	io.token =
 #ifdef TOKEN
 	TOKEN;
