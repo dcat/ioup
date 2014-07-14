@@ -29,6 +29,7 @@
 #define IOUP_LIST	IOUP_BASE "p/list.php"
 #define IOUP_REMOVE	IOUP_BASE "remove.php"
 #define IOUP_UPLOAD	IOUP_BASE "post.php"
+#define IOUP_TMP_FILE	"/tmp/ioup.stdin"
 
 typedef struct {
 	const char *xt;
@@ -89,7 +90,7 @@ void io_post (ioup_t io) {
 		if (S_ISCHR(sstat.st_mode))
 			puts("^C: exit, ^D: post");
 		
-		io.file = "/tmp/ioup.stdin";
+		io.file = IOUP_TMP_FILE;
 		io.name = "stdin";
 		out     = fopen(io.file, "w");
 		in      = stdin;
@@ -160,7 +161,8 @@ void io_post (ioup_t io) {
 		curl_easy_setopt(c, CURLOPT_HTTPPOST, formpost);
 		res = curl_easy_perform(c);
 		if (res != CURLE_OK)
-			fprintf(stderr, "error: %s", curl_easy_strerror(res));
+			fprintf(stderr, "curl error: %s",
+					curl_easy_strerror(res));
 		if (io.std_in)
 			unlink(io.file);
 		curl_easy_cleanup(c);
