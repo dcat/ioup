@@ -17,9 +17,11 @@ if no file extenstion is given or it is unrecognised,
 .B ioup 
 will upload it like a text/binary file. So make sure that your file always contains the correct 
 suffix!
+
+.B ioup reads the shell variable IOUP_TOKEN, so make sure you set it.
 .SH OPTIONS
 .IP "-l" 
-.B list all files you've alredy pasted on pub.iotek.org
+.B list all files you've alredy pasted on IOPaste
 .IP "-r file"
 .B remove the given file in the format: p/RAnD0m
 .SH EXAMPLES
@@ -33,12 +35,10 @@ suffix!
 .B \- this removes the file pub.iotek.org/p/RAnD0m
 .IP "$ dmesg | tail -n4 | ioup"
 .B \- used this way, ioup will read directy from STDIN and creates your file on pub.iotek.org itself
-.SH FILES
-.I ~/.iouprc
 .SH BUGS
 .B Bugs? There are no bugs in this Software. It was written through the power of slienz.
 .SH AUTHOR
-.IP "Jack N. White  <dcat at iotek dot org>"
+.IP "a dead cat <dcat at iotek dot org>"
 .IP "Danny Svensson <neuromatic at archlinux dot info>"
 .SH SEE ALSO
 .BR libcurl(3)

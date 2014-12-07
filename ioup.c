@@ -38,39 +38,14 @@ typedef struct {
 } ioup_t;
 
 /* get string after last dot */
-const char *last_dot (const char *s) {
+const char *
+last_dot (const char *s) {
 	const char *d = strrchr(s, '.');
 	return ! d || d == s ? NULL : d + 1;
 }
 
-/* read $HOME/.iouprc */
-#ifndef TOKEN
-char *read_iouprc (void) {
-	int i,c;
-	FILE *fp;
-	char *path,token[12],*r;
-
-	asprintf(&path, "%s/.iouprc", getenv("HOME"));
-
-	/* byte by byte read */
-	if ((fp = fopen(path, "r"))) {
-		for (i=0; i < 10; i++) {
-			c = fgetc(fp);
-			token[i] = c && c != EOF ? (char) c : 0;
-		}
-		token[11] = '\0';
-	}
-	else
-		return NULL;
-
-	r = malloc(sizeof(char)*10);
-	strncpy(r, token, 10);
-
-	return r;
-}
-#endif
-
-void io_post (ioup_t io) {
+void
+io_post (ioup_t io) {
 	FILE *in,*out;
 	char *url = io.list ? IOUP_LIST : IOUP_UPLOAD;
 	int chr;
@@ -81,6 +56,7 @@ void io_post (ioup_t io) {
 	struct curl_httppost *lastptr   = NULL;
 	struct curl_slist *headerlist   = NULL;
 	struct stat sstat;
+
 	static const char buf[] = "Expect:";
 
 	/* read from stdin */
@@ -163,8 +139,10 @@ void io_post (ioup_t io) {
 		if (res != CURLE_OK)
 			fprintf(stderr, "curl error: %s",
 					curl_easy_strerror(res));
+
 		if (io.std_in)
 			unlink(io.file);
+
 		curl_easy_cleanup(c);
 		curl_formfree(formpost);
 		curl_slist_free_all(headerlist);
@@ -174,12 +152,7 @@ void io_post (ioup_t io) {
 int main (int argc, char *argv[]) {
 	ioup_t io;
 	/* if TOKEN is defined, hardcode it */
-	io.token =
-#ifdef TOKEN
-	TOKEN;
-#else
-	read_iouprc();
-#endif
+	io.token = getenv("IOUP_TOKEN");
 	io.list = io.remove = io.std_in = false;
 	io.file = (argc >= 2) ? argv[1] : NULL;
 	io.name = (argc >= 2) ? argv[1] : "stdin";
