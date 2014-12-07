@@ -26,12 +26,7 @@ list all uploaded files.
 ```sh
 ioup -l
 ```
-
-Unless it's hardcoded, ioup reads your token from `$HOME/.iouprc`
-To hardcode it, define TOKEN at compile-time.
-```sh
-CFLAGS='-DTOKEN=\"yOUrT0kEN\"' make
-```
+Token is read from the shell variable `IOUP_TOKEN`
 
 To remove all files associated with your token, you can do something like;
 ```sh
