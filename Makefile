@@ -12,11 +12,11 @@ all: ioup
 	@${CC} ${CFLAGS} -DVERSION=\"${VERSION}\" -c $<
 
 ioup: ioup.o
-	@${CC} ${CFLAGS} ${LDFLAGS} -o $@ ioup.o
+	@${CC} ioup.o ${CFLAGS} ${LDFLAGS} -o $@
 
 clean:
-	${RM} ioup
 	${RM} *.o
+	${RM} ioup
 
 install:
 	install -m755 ioup   ${PREFIX}/bin/ioup

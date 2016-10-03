@@ -34,14 +34,61 @@
 typedef struct {
 	const char *xt;
 	char *token,*name,*file;
-	bool list,remove,std_in;
+	bool list,f_list,remove,std_in;
 } ioup_t;
+
+typedef struct {
+	char *ptr;
+	size_t len;
+} string;
 
 /* get string after last dot */
 const char *
 last_dot (const char *s) {
 	const char *d = strrchr(s, '.');
 	return ! d || d == s ? NULL : d + 1;
+}
+
+void
+init_string(string *s) {
+	s->len = 0;
+	s->ptr = malloc(s->len+1);
+	if (s->ptr == NULL) {
+		fprintf(stderr, "malloc() failed\n");
+		exit(EXIT_FAILURE);
+	}
+	s->ptr[0] = '\0';
+}
+
+size_t
+writefunc(void *ptr, size_t size, size_t nmemb, string *s) {
+	size_t new_len = s->len + size*nmemb;
+	s->ptr = realloc(s->ptr, new_len+1);
+	if (s->ptr == NULL) {
+		fprintf(stderr, "realloc() failed\n");
+		exit(EXIT_FAILURE);
+	}
+	memcpy(s->ptr+s->len, ptr, size*nmemb);
+	s->ptr[new_len] = '\0';
+	s->len = new_len;
+
+	return size*nmemb;
+}
+
+void
+prepend_url (string *s) {
+	char *s_p;
+	for (s_p = s->ptr; *s_p != '\0'; s_p++) {
+		if (s_p == s->ptr) {
+			printf("%s", IOUP_BASE);
+		}
+		else if (*s_p == '\n' && *(s_p+1) != '\0') {
+			printf("\n%s", IOUP_BASE);
+		}
+		else {
+			printf("%c", *s_p);
+		}
+	}
 }
 
 void
@@ -135,6 +182,14 @@ io_post (ioup_t io) {
 		curl_easy_setopt(c, CURLOPT_URL, url);
 		curl_easy_setopt(c, CURLOPT_HTTPHEADER, headerlist);
 		curl_easy_setopt(c, CURLOPT_HTTPPOST, formpost);
+
+
+		string s;
+		init_string(&s);
+
+		curl_easy_setopt(c, CURLOPT_WRITEFUNCTION, writefunc);
+		curl_easy_setopt(c, CURLOPT_WRITEDATA, &s);
+
 		res = curl_easy_perform(c);
 		if (res != CURLE_OK)
 			fprintf(stderr, "curl error: %s",
@@ -146,6 +201,13 @@ io_post (ioup_t io) {
 		curl_easy_cleanup(c);
 		curl_formfree(formpost);
 		curl_slist_free_all(headerlist);
+
+		if (io.f_list)
+			prepend_url(&s);
+		else
+			printf("%s\n", s.ptr);
+
+		free(s.ptr);
 	}
 }
 
@@ -153,13 +215,17 @@ int main (int argc, char *argv[]) {
 	ioup_t io;
 	/* if TOKEN is defined, hardcode it */
 	io.token = getenv("IOUP_TOKEN");
-	io.list = io.remove = io.std_in = false;
+	io.list = io.remove = io.f_list = io.std_in = false;
 	io.file = (argc >= 2) ? argv[1] : NULL;
 	io.name = (argc >= 2) ? argv[1] : "stdin";
 
 	if (argc >= 2 && argv[1][0] == '-') {
 		switch  (argv[1][1]) {
 			case 'l':
+				io.list = true;
+				break;
+			case 'L':
+				io.f_list = true;
 				io.list = true;
 				break;
 			case 'r':
@@ -177,7 +243,6 @@ int main (int argc, char *argv[]) {
 	
 	if (argc < 2) io.std_in = true;
 	io_post(io);
-	putchar('\n');
 
 	return 0;
 }
